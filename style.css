@@ -1,0 +1,13 @@
+#gameCanvas
+{
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0); 
+}
+#score
+{
+    text-align: center;
+    font-size: 30px;
+    font-family: Menlo;
+    color: brown;
+}
