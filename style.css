@@ -1,13 +1,36 @@
-#gameCanvas
+#game_canvas
 {
     position: absolute;
     left: 50%;
-    transform: translate(-50%, 0); 
+    transform: translate(-50%, 0);
+}
+#board
+{
+    background-color: #c3c3;
+    width: 400px;
+    height: 40px;
+    position: relative;
+    left: 50%;
+    transform: translate(-50%, 0);
+    display: flex;
+    justify-content: space-between;
+    font-family: Menlo;
 }
 #score
 {
-    text-align: center;
     font-size: 30px;
-    font-family: Menlo;
     color: brown;
+    position: absolute;
+    left: 0%;
+    top: 50%;
+    transform: translate(0, -50%);
+}
+#game_version
+{
+    font-size: 15px;
+    color: chocolate;
+    position: absolute;
+    right: 0%;
+    top: 100%;
+    transform: translate(0, -100%);
 }

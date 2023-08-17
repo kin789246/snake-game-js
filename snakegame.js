@@ -1,4 +1,6 @@
-/* https://www.educative.io/blog/javascript-snake-game-tutorial */
+/* 
+    based on https://www.educative.io/blog/javascript-snake-game-tutorial 
+*/
 
 const board_border = 'black';
 const board_background = '#F1F1F1';
@@ -8,44 +10,68 @@ const food_color = 'lightgreen';
 const food_border = 'darkgreen';
 const snake_size = 10;
 const food_size = 10;
-const game_fps = 1000/15;
+const snake_speed = 1000/15;
+const snakeboard = document.getElementById("game_canvas");
+const snakeboard_ctx = snakeboard.getContext("2d");
 
-let changing_direction = false;
-let dx = 10;
-let dy = 0;
+let game_id;
+let changing_direction;
+let dx;
+let dy;
 let food_x;
 let food_y;
-let score = 0;
-const snakeboard = document.getElementById("gameCanvas");
-const snakeboard_ctx = gameCanvas.getContext("2d");
-
-let snake = [ 
-    { x: 200, y: 200 },
-    { x: 190, y: 200 },
-    { x: 180, y: 200 },
-    { x: 170, y: 200 },
-    { x: 160, y: 200 }
-];
+let score;
+let snake;
+let snake_direction;
+let elapsed_time = 0;
+let previous_time_stamp = 0;
 
 document.addEventListener("keydown", changeDirection);
 
-main();
-genFood();
-function main()
+gameSetup();
+game_id = requestAnimationFrame(game_loop);
+
+function game_loop(time_stamp)
 {
     if (hasGameEnded()) return;
 
     changing_direction = false;
-    setTimeout(gameUpdate, game_fps)
+
+    elapsed_time = time_stamp - previous_time_stamp;
+    //elapsed_time = Math.min(elapsed_time, 0.1);
+    if (elapsed_time > snake_speed)
+    {
+        previous_time_stamp = time_stamp;
+        moveSnake(elapsed_time);
+
+        clearCanvas();
+        drawSnake();
+        drawFood();
+    } 
+    game_id = requestAnimationFrame(game_loop);
 }
 
-function gameUpdate()
+function setVersion()
 {
-    clearCanvas();
-    moveSnake();
-    drawSnake();
-    drawFood();
-    main();
+    ver = document.getElementById('game_version');
+    ver.innerHTML = "v0.2";
+}
+
+function gameSetup()
+{
+    setVersion();
+    snake = [
+        { x: 200, y: 200 },
+        { x: 190, y: 200 },
+        { x: 180, y: 200 },
+        { x: 170, y: 200 },
+        { x: 160, y: 200 }
+    ];
+    score = 0;
+    snake_direction = { x: 1, y: 0 };
+    dx = snake_size * snake_direction.x;
+    dy = snake_size * snake_direction.y;
+    genFood();
 }
 
 function clearCanvas()
@@ -84,15 +110,21 @@ function drawSnake()
     snake.forEach(drawSnakePart);
 }
 
-function moveSnake()
+function moveSnake(seconds_passed)
 {
-    const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+    dx = snake_size * snake_direction.x;
+    dy = snake_size * snake_direction.y;
+    //console.log(dx, dy);
+    let head = { 
+        x: snake[0].x + dx,
+        y: snake[0].y + dy
+    };
     snake.unshift(head); /* add the new head in front of the snake body */
-    const has_eaten_food = snake[0].x === food_x && snake[0].y === food_y;
+    let has_eaten_food = snake[0].x === food_x && snake[0].y === food_y;
     if (has_eaten_food)
     {
         score += 10;
-        document.getElementById('score').innerHTML = score;
+        document.getElementById('score').innerHTML = "分數：" + score;
         genFood();
     }
     else
@@ -105,28 +137,19 @@ function changeDirection(event)
 {
     if (changing_direction) return;
     changing_direction = true;
-
-    const goingUp = dy === -10;
-    const goingDown = dy === 10;
-    const goingLeft = dx === -10;
-    const goingRight = dx === 10;
     
-    if ((event.key === "ArrowLeft") && !goingRight)
+    if ((event.key === "ArrowLeft") && snake_direction.x != 1)
     {
-        dx = -10;
-        dy = 0;
+        snake_direction = { x: -1, y: 0 };
     }
-    if ((event.key === "ArrowRight") && !goingLeft) {
-        dx = 10;
-        dy = 0;
+    if ((event.key === "ArrowRight") && snake_direction.x != -1) {
+        snake_direction = { x: 1, y: 0 };
     }
-    if ((event.key === "ArrowDown") && !goingUp) {
-        dx = 0;
-        dy = 10;
+    if ((event.key === "ArrowDown") && snake_direction.y != -1) {
+        snake_direction = { x: 0, y: 1 };
     }
-    if ((event.key === "ArrowUp") && !goingDown) {
-        dx = 0;
-        dy = -10;
+    if ((event.key === "ArrowUp") && snake_direction.y != 1) {
+        snake_direction = { x: 0, y: -1 };
     }
 }
 
